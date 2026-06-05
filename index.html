@@ -439,8 +439,8 @@ aside.collapsed .menu-btn {
     let clientes = [];
     let financeiro = [];
     let estoqueGeral = [];
-    let caixa,
-        cart = { saldo: 0, lucro: 0 };
+    let caixa = { saldo: 0, lucro: 0 };
+    let cart = [];
     let descontoAtual = 0;
 
     // Inicialização do Sistema
@@ -524,7 +524,8 @@ document.getElementById('fin-lucro').innerText =
         clientes,
         financeiro,
         estoqueGeral,
-        caixa
+        caixa,
+        cart
     };
 
     localStorage.setItem('sisPDV_Dados', JSON.stringify(data));
