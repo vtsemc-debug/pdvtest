@@ -94,10 +94,14 @@ aside.collapsed {
     }
 }
 
-aside.collapsed h2,
-aside.collapsed .menu-btn span,
-aside.collapsed div {
-    display: none;
+@media (min-width: 769px) {
+
+    aside.collapsed h2,
+    aside.collapsed .menu-btn span,
+    aside.collapsed div {
+        display: none;
+    }
+
 }
 
 aside.collapsed .menu-btn {
