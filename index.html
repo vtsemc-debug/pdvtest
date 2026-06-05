@@ -153,10 +153,8 @@ aside.collapsed .menu-btn {
         padding: 12px;
     }
 
-    input,
-    select,
-    button {
-        width: 100% !important;
+    .mobile-stack > * {
+        width: 100%;
     }
 
     div[style*="display: flex"] {
@@ -172,11 +170,21 @@ aside.collapsed .menu-btn {
         left: 10px;
     }
 }
-    </style>
+    
+#overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    z-index:998;
+    display:none;
+}
+
+</style>
 </head>
 <body>
 
     <button id="toggle-sidebar">☰</button>
+<div id="overlay"></div>
 
 <!-- Sidebar de Navegação -->
 <aside>
@@ -426,14 +434,17 @@ aside.collapsed .menu-btn {
     
     // Carrinho atual
     let cart = [];
+        descontoAtual = 0;
     let produtos = [];
     let clientes = [];
     let financeiro = [];
     let estoqueGeral = [];
-    let caixa = { saldo: 0, lucro: 0 };
+    let caixa,
+        cart = { saldo: 0, lucro: 0 };
+    let descontoAtual = 0;
 
     // Inicialização do Sistema
-    window.onload = function() {
+    document.addEventListener('DOMContentLoaded', () => {
 
     const dadosSalvos = localStorage.getItem('sisPDV_Dados');
 
@@ -444,6 +455,7 @@ aside.collapsed .menu-btn {
         financeiro = data.financeiro || [];
         estoqueGeral = data.estoqueGeral || [];
         caixa = data.caixa || { saldo: 0, lucro: 0 };
+        cart = data.cart || [];
     } else {
         gerarDadosIniciais();
     }
@@ -460,7 +472,7 @@ document.getElementById('fin-saldo-dia').innerText =
 document.getElementById('fin-lucro').innerText =
     formatCurrency(caixa.lucro);
 
-}
+});
     function gerarDadosIniciais() {
         // Dados de Exemplo
         produtos = [
@@ -574,14 +586,14 @@ document.getElementById('fin-lucro').innerText =
         const container = document.getElementById('cart-items');
         container.innerHTML = '';
         
-        let total = 0;
+        let subtotal = 0;
 
         if (cart.length === 0) {
             container.innerHTML = '<div style="text-align: center; padding: 20px; color: #999;">Nenhum item adicionado</div>';
         } else {
             cart.forEach((item, index) => {
                 const sub = item.venda * item.qtd;
-                total += sub;
+                subtotal += sub;
                 const div = document.createElement('div');
                 div.className = 'cart-item';
                 div.innerHTML = `
@@ -597,6 +609,9 @@ document.getElementById('fin-lucro').innerText =
                 container.appendChild(div);
             });
         }
+
+        const desconto = subtotal * (descontoAtual / 100);
+        const total = subtotal - desconto;
 
         document.getElementById('cart-total').innerText = formatCurrency(total);
     }
@@ -628,13 +643,13 @@ document.getElementById('fin-lucro').innerText =
 }
 
     function aplicarDesconto() {
-    const desc = prompt('Porcentagem de desconto (%):', '0');
+    const desc = prompt('Porcentagem de desconto (%):', descontoAtual);
 
-    if (desc && !isNaN(desc)) {
-        descontoAtual = parseFloat(desc);
+    if (desc !== null && !isNaN(desc)) {
+        descontoAtual = parseFloat(desc) || 0;
         renderCart();
-        total = total - (total * descontoAtual / 100);
     }
+}
 }
 
     function sangria() {
@@ -658,18 +673,20 @@ document.getElementById('fin-lucro').innerText =
             return;
         }
 
-        let totalVenda = 0;
+        let subtotal = 0;
         let custoVenda = 0;
 
         // Processa venda
         cart.forEach(item => {
             const estItem = estoqueGeral.find(e => e.cod === item.cod);
-            if (estItem) {
-                estItem.quantidade -= item.qtd;
-            }
-            totalVenda += item.venda * item.qtd;
+            if (!estItem) return;
+            estItem.quantidade -= item.qtd;
+            subtotal += item.venda * item.qtd;
             custoVenda += item.custo * item.qtd;
         });
+
+        const desconto = subtotal * (descontoAtual / 100);
+        const totalVenda = subtotal - desconto;
 
         // Registra no financeiro
         const lucro = totalVenda - custoVenda;
@@ -687,6 +704,7 @@ document.getElementById('fin-lucro').innerText =
 
         // Limpa carrinho
         cart = [];
+        descontoAtual = 0;
         renderCart();
         renderProdutos(); // Atualiza estoque visual no PDV
         renderEstoque();
@@ -790,7 +808,7 @@ document.getElementById('fin-lucro').innerText =
         const desc = document.getElementById('fin-desc').value;
         const valor = parseFloat(document.getElementById('fin-valor').value);
 
-        if (!desc || isNaN(valor)) {
+        if (!desc || isNaN(valor) || valor <= 0) {
             alert('Preencha descrição e valor!');
             return;
         }
@@ -933,7 +951,7 @@ document.getElementById('fin-lucro').innerText =
         }
 
         const novoProduto = {
-            id: produtos.length + 1,
+            id: Date.now(),
             cod: cod,
             nome: nome,
             categoria: document.getElementById('prod-categoria').value,
@@ -992,20 +1010,26 @@ document.getElementById('fin-lucro').innerText =
     const sidebar = document.querySelector('aside');
 const toggleBtn = document.getElementById('toggle-sidebar');
 
+const overlay = document.getElementById('overlay');
+
 toggleBtn.addEventListener('click', () => {
 
     if (window.innerWidth <= 768) {
 
-        if (sidebar.style.left === '0px') {
-            sidebar.style.left = '-220px';
-        } else {
-            sidebar.style.left = '0px';
-        }
+        const aberto = sidebar.style.left === '0px';
+
+        sidebar.style.left = aberto ? '-220px' : '0px';
+        overlay.style.display = aberto ? 'none' : 'block';
 
     } else {
         sidebar.classList.toggle('collapsed');
     }
 
+});
+
+overlay.addEventListener('click', () => {
+    sidebar.style.left = '-220px';
+    overlay.style.display = 'none';
 });
 
 </script>
