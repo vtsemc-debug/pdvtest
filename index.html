@@ -83,21 +83,6 @@ aside {
     overflow: hidden;
 }
 
-@media (min-width: 769px) {
-
-    aside.collapsed h2,
-    aside.collapsed .menu-btn span,
-    aside.collapsed div {
-        display: none;
-    }
-
-}
-
-aside.collapsed .menu-btn {
-    text-align: center;
-    padding: 15px 0;
-}
-
 @media (max-width: 768px) {
 
     body {
@@ -111,24 +96,11 @@ aside.collapsed .menu-btn {
         top: 0;
         height: 100vh;
         z-index: 999;
+        transition: .3s;
     }
 
-    @media (max-width: 768px){
-
-    aside{
-        left:-220px;
-        transition:.3s;
-    }
-
-    aside.mobile-open{
-        left:0;
-    }
-
-}
-
-    aside.collapsed {
+    aside.mobile-open {
         left: 0;
-        width: 220px;
     }
 
     main {
@@ -175,6 +147,16 @@ aside.collapsed .menu-btn {
         top: 10px;
         left: 10px;
     }
+
+}
+
+        aside.collapsed {
+    width: 70px;
+}
+
+aside.collapsed h2,
+aside.collapsed .menu-btn span {
+    display: none;
 }
     
 #overlay{
@@ -439,15 +421,13 @@ aside.collapsed .menu-btn {
        ========================================== */
     
     // Carrinho atual
-    let cart = [];
-        descontoAtual = 0;
-    let produtos = [];
-    let clientes = [];
-    let financeiro = [];
-    let estoqueGeral = [];
-    let caixa = { saldo: 0, lucro: 0 };
-    let cart = [];
-    let descontoAtual = 0;
+   let cart = [];
+let descontoAtual = 0;
+let produtos = [];
+let clientes = [];
+let financeiro = [];
+let estoqueGeral = [];
+let caixa = { saldo: 0, lucro: 0 };
 
     // Inicialização do Sistema
     document.addEventListener('DOMContentLoaded', () => {
@@ -657,7 +637,7 @@ document.getElementById('fin-lucro').innerText =
         renderCart();
     }
 }
-}
+
 
     function sangria() {
     const valor = prompt('Valor para sangria (retirada de caixa):', '0');
