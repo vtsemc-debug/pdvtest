@@ -83,17 +83,6 @@ aside {
     overflow: hidden;
 }
 
-aside.collapsed {
-    width: 70px;
-}
-
-@media (max-width: 768px) {
-    aside.collapsed {
-        left: 0;
-        width: 220px;
-    }
-}
-
 @media (min-width: 769px) {
 
     aside.collapsed h2,
@@ -123,6 +112,19 @@ aside.collapsed .menu-btn {
         height: 100vh;
         z-index: 999;
     }
+
+    @media (max-width: 768px){
+
+    aside{
+        left:-220px;
+        transition:.3s;
+    }
+
+    aside.mobile-open{
+        left:0;
+    }
+
+}
 
     aside.collapsed {
         left: 0;
@@ -1014,26 +1016,32 @@ document.getElementById('fin-lucro').innerText =
     
     const sidebar = document.querySelector('aside');
 const toggleBtn = document.getElementById('toggle-sidebar');
-
 const overlay = document.getElementById('overlay');
 
 toggleBtn.addEventListener('click', () => {
 
-    if (window.innerWidth <= 768) {
+    if(window.innerWidth <= 768){
 
-        const aberto = sidebar.style.left === '0px';
+        const aberto = sidebar.classList.contains('mobile-open');
 
-        sidebar.style.left = aberto ? '-220px' : '0px';
-        overlay.style.display = aberto ? 'none' : 'block';
+        if(aberto){
+            sidebar.classList.remove('mobile-open');
+            overlay.style.display = 'none';
+        } else {
+            sidebar.classList.add('mobile-open');
+            overlay.style.display = 'block';
+        }
 
     } else {
+
         sidebar.classList.toggle('collapsed');
+
     }
 
 });
 
 overlay.addEventListener('click', () => {
-    sidebar.style.left = '-220px';
+    sidebar.classList.remove('mobile-open');
     overlay.style.display = 'none';
 });
 
