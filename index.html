@@ -1,120 +1,723 @@
-<script>
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* =========================================================
-   SISPDV PRO - SISTEMA FUNCIONAL
-========================================================= */
+<title>SisPDV Pro</title>
 
-let cart = [];
-let descontoAtual = 0;
+<style>
 
-let produtos = [];
-let clientes = [];
-let financeiro = [];
-let estoqueGeral = [];
+:root{
+    --primary:#1e293b;
+    --secondary:#2563eb;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#d97706;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --border:#dbe2ea;
+    --text:#0f172a;
+}
 
-let caixa = {
-    saldo: 0,
-    lucro: 0
-};
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-/* =========================================================
-   INIT
-========================================================= */
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    height:100vh;
+    display:flex;
+    overflow:hidden;
+}
 
-document.addEventListener('DOMContentLoaded', () => {
+/* SIDEBAR */
 
-    carregarDados();
+aside{
+    width:240px;
+    background:var(--primary);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+    transition:.3s;
+}
 
-    renderTudo();
+.logo{
+    font-size:1.5rem;
+    font-weight:bold;
+    margin-bottom:25px;
+    text-align:center;
+}
 
-    iniciarMenuMobile();
+.menu-btn{
+    border:none;
+    background:none;
+    color:#cbd5e1;
+    text-align:left;
+    padding:14px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-bottom:8px;
+    transition:.2s;
+    font-size:1rem;
+}
 
-});
+.menu-btn:hover,
+.menu-btn.active{
+    background:var(--secondary);
+    color:#fff;
+}
 
-/* =========================================================
-   STORAGE
-========================================================= */
+main{
+    flex:1;
+    overflow-y:auto;
+    padding:20px;
+}
 
-function carregarDados() {
+.section{
+    display:block;
+}
 
-    const dados = localStorage.getItem('sisPDV_Dados');
+.hidden{
+    display:none;
+}
 
-    if (dados) {
+.card{
+    background:var(--card);
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
 
-        const db = JSON.parse(dados);
+.header{
+    font-size:1.5rem;
+    margin-bottom:20px;
+    font-weight:bold;
+}
 
-        produtos = db.produtos || [];
-        clientes = db.clientes || [];
-        financeiro = db.financeiro || [];
-        estoqueGeral = db.estoqueGeral || [];
-        caixa = db.caixa || { saldo:0, lucro:0 };
+/* BUTTONS */
 
-    } else {
+.btn{
+    border:none;
+    border-radius:8px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-weight:bold;
+}
 
-        gerarDadosIniciais();
+.btn-primary{
+    background:var(--secondary);
+    color:#fff;
+}
 
+.btn-success{
+    background:var(--success);
+    color:#fff;
+}
+
+.btn-danger{
+    background:var(--danger);
+    color:#fff;
+}
+
+.btn-warning{
+    background:var(--warning);
+    color:#fff;
+}
+
+.btn-sm{
+    padding:6px 10px;
+    font-size:.8rem;
+}
+
+/* INPUTS */
+
+input,
+select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,
+td{
+    padding:12px;
+    border-bottom:1px solid var(--border);
+    text-align:left;
+}
+
+th{
+    background:#f8fafc;
+}
+
+/* PDV */
+
+.pdv{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.produtos{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:12px;
+}
+
+.produto{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.produto:hover{
+    border-color:var(--secondary);
+    transform:translateY(-2px);
+}
+
+.produto h4{
+    font-size:.95rem;
+    margin-bottom:8px;
+}
+
+.produto small{
+    color:#64748b;
+}
+
+.price{
+    color:var(--success);
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.cart{
+    background:#fff;
+    border-radius:12px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    height:100%;
+}
+
+.cart-items{
+    flex:1;
+    overflow-y:auto;
+    margin:15px 0;
+}
+
+.cart-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.total{
+    font-size:1.5rem;
+    font-weight:bold;
+    margin-bottom:15px;
+    text-align:right;
+}
+
+.payment-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+/* MOBILE */
+
+#toggle-menu{
+    display:none;
+}
+
+@media(max-width:768px){
+
+    body{
+        flex-direction:column;
+    }
+
+    aside{
+        position:fixed;
+        top:0;
+        left:-100%;
+        height:100vh;
+        z-index:1000;
+    }
+
+    aside.open{
+        left:0;
+    }
+
+    #toggle-menu{
+        display:block;
+        position:fixed;
+        top:10px;
+        left:10px;
+        z-index:1100;
+        width:45px;
+        height:45px;
+        border:none;
+        border-radius:8px;
+        background:var(--secondary);
+        color:#fff;
+        font-size:1.2rem;
+    }
+
+    main{
+        padding-top:70px;
+    }
+
+    .pdv{
+        grid-template-columns:1fr;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
     }
 
 }
 
-function salvarDados() {
+</style>
+</head>
 
-    localStorage.setItem('sisPDV_Dados', JSON.stringify({
+<body>
+
+<button id="toggle-menu">☰</button>
+
+<aside id="sidebar">
+
+<div class="logo">
+SisPDV
+</div>
+
+<button class="menu-btn active" onclick="showSection(event,'pdv')">
+🛒 Frente Caixa
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'estoque')">
+📦 Estoque
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'financeiro')">
+💰 Financeiro
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'clientes')">
+👥 Clientes
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'produtos')">
+🏷 Produtos
+</button>
+
+</aside>
+
+<main>
+
+<!-- PDV -->
+
+<section id="section-pdv" class="section">
+
+<div class="header">
+🛒 Frente de Caixa
+</div>
+
+<div class="pdv">
+
+<div>
+
+<div class="card">
+
+<div style="display:flex; gap:10px; margin-bottom:15px;">
+
+<input
+type="text"
+id="busca-produto"
+placeholder="Código ou nome..."
+onkeyup="buscarProduto()"
+>
+
+</div>
+
+<div class="produtos" id="grid-produtos"></div>
+
+</div>
+
+</div>
+
+<div class="cart">
+
+<h3>Cupom</h3>
+
+<div class="cart-items" id="cart-items"></div>
+
+<div class="total">
+R$ <span id="cart-total">0,00</span>
+</div>
+
+<div class="payment-grid">
+
+<button class="btn btn-success"
+onclick="finalizarVenda('Dinheiro')">
+💵 Dinheiro
+</button>
+
+<button class="btn btn-primary"
+onclick="finalizarVenda('Pix')">
+📱 Pix
+</button>
+
+<button class="btn btn-warning"
+onclick="finalizarVenda('Cartão')">
+💳 Cartão
+</button>
+
+<button class="btn btn-danger"
+onclick="limparCarrinho()">
+🗑 Limpar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ESTOQUE -->
+
+<section id="section-estoque" class="section hidden">
+
+<div class="header">
+📦 Estoque
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Código</th>
+<th>Produto</th>
+<th>Qtd</th>
+<th>Preço</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="estoque-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- FINANCEIRO -->
+
+<section id="section-financeiro" class="section hidden">
+
+<div class="header">
+💰 Financeiro
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+<div class="card">
+<h3>Saldo</h3>
+<h1 id="saldo">R$ 0,00</h1>
+</div>
+
+<div class="card">
+<h3>Lucro</h3>
+<h1 id="lucro">R$ 0,00</h1>
+</div>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Data</th>
+<th>Tipo</th>
+<th>Descrição</th>
+<th>Valor</th>
+</tr>
+</thead>
+
+<tbody id="financeiro-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- CLIENTES -->
+
+<section id="section-clientes" class="section hidden">
+
+<div class="header">
+👥 Clientes
+</div>
+
+<div class="card">
+
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px;">
+
+<input type="text" id="cliente-nome" placeholder="Nome">
+<input type="text" id="cliente-cpf" placeholder="CPF">
+<input type="text" id="cliente-tel" placeholder="Telefone">
+
+<button class="btn btn-success"
+onclick="adicionarCliente()">
+Salvar
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Nome</th>
+<th>CPF</th>
+<th>Telefone</th>
+<th>Ação</th>
+</tr>
+</thead>
+
+<tbody id="clientes-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- PRODUTOS -->
+
+<section id="section-produtos" class="section hidden">
+
+<div class="header">
+🏷 Produtos
+</div>
+
+<div class="card">
+
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:10px;">
+
+<input type="text" id="prod-cod" placeholder="Código">
+<input type="text" id="prod-nome" placeholder="Nome">
+<input type="number" id="prod-preco" placeholder="Preço">
+<input type="number" id="prod-qtd" placeholder="Qtd">
+
+<button class="btn btn-success"
+onclick="adicionarProduto()">
+Cadastrar
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Código</th>
+<th>Produto</th>
+<th>Preço</th>
+<th>Qtd</th>
+<th>Ação</th>
+</tr>
+</thead>
+
+<tbody id="produtos-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+</main>
+
+<script>
+
+/* ======================================
+   DATABASE
+====================================== */
+
+let produtos = [
+    {
+        cod:'7891',
+        nome:'Coca Cola',
+        preco:6,
+        qtd:20
+    },
+
+    {
+        cod:'7892',
+        nome:'Arroz 5KG',
+        preco:32,
+        qtd:10
+    },
+
+    {
+        cod:'7893',
+        nome:'Feijão',
+        preco:9,
+        qtd:15
+    }
+];
+
+let clientes = [];
+
+let financeiro = [];
+
+let carrinho = [];
+
+let caixa = {
+    saldo:0,
+    lucro:0
+};
+
+/* ======================================
+   INIT
+====================================== */
+
+document.addEventListener('DOMContentLoaded',()=>{
+
+    carregar();
+
+    renderAll();
+
+    iniciarMenu();
+
+});
+
+/* ======================================
+   STORAGE
+====================================== */
+
+function salvar(){
+
+    localStorage.setItem('sisPDV_v2',JSON.stringify({
         produtos,
         clientes,
         financeiro,
-        estoqueGeral,
         caixa
     }));
 
 }
 
-/* =========================================================
-   DADOS EXEMPLO
-========================================================= */
+function carregar(){
 
-function gerarDadosIniciais() {
+    const db = localStorage.getItem('sisPDV_v2');
 
-    produtos = [
-        {
-            id: 1,
-            cod: '78910001',
-            nome: 'Coca Cola Lata',
-            categoria: 'Bebidas',
-            marca: 'Coca-Cola',
-            un: 'UN',
-            custo: 3,
-            venda: 6,
-            estMin: 5
-        },
+    if(!db) return;
 
-        {
-            id: 2,
-            cod: '78910002',
-            nome: 'Arroz 5kg',
-            categoria: 'Alimentos',
-            marca: 'Camil',
-            un: 'UN',
-            custo: 18,
-            venda: 29.9,
-            estMin: 3
-        }
-    ];
+    const dados = JSON.parse(db);
 
-    estoqueGeral = produtos.map(p => ({
-        ...p,
-        quantidade: 20
-    }));
+    produtos = dados.produtos || produtos;
+    clientes = dados.clientes || [];
+    financeiro = dados.financeiro || [];
+    caixa = dados.caixa || caixa;
 
 }
 
-/* =========================================================
-   RENDER GLOBAL
-========================================================= */
+/* ======================================
+   UTIL
+====================================== */
 
-function renderTudo() {
+function money(v){
+
+    return Number(v || 0)
+        .toFixed(2)
+        .replace('.',',');
+
+}
+
+/* ======================================
+   MENU
+====================================== */
+
+function showSection(event,id){
+
+    document.querySelectorAll('.section')
+        .forEach(sec=>sec.classList.add('hidden'));
+
+    document.getElementById('section-'+id)
+        .classList.remove('hidden');
+
+    document.querySelectorAll('.menu-btn')
+        .forEach(btn=>btn.classList.remove('active'));
+
+    event.currentTarget.classList.add('active');
+
+    if(window.innerWidth <= 768){
+
+        document.getElementById('sidebar')
+            .classList.remove('open');
+
+    }
+
+}
+
+function iniciarMenu(){
+
+    document.getElementById('toggle-menu')
+        .addEventListener('click',()=>{
+
+            document.getElementById('sidebar')
+                .classList.toggle('open');
+
+        });
+
+}
+
+/* ======================================
+   RENDER
+====================================== */
+
+function renderAll(){
 
     renderProdutosPDV();
+
     renderCarrinho();
 
     renderEstoque();
@@ -127,108 +730,91 @@ function renderTudo() {
 
 }
 
-/* =========================================================
-   UTIL
-========================================================= */
-
-function moeda(valor) {
-
-    return Number(valor || 0)
-        .toFixed(2)
-        .replace('.', ',');
-
-}
-
-function showSection(event, id) {
-
-    document.querySelectorAll('.section')
-        .forEach(sec => sec.classList.add('hidden'));
-
-    document.getElementById('section-' + id)
-        .classList.remove('hidden');
-
-    document.querySelectorAll('.menu-btn')
-        .forEach(btn => btn.classList.remove('active'));
-
-    event.currentTarget.classList.add('active');
-
-}
-
-/* =========================================================
+/* ======================================
    PDV
-========================================================= */
+====================================== */
 
-function renderProdutosPDV() {
+function renderProdutosPDV(lista = produtos){
 
-    const grid = document.getElementById('products-grid');
+    const grid = document.getElementById('grid-produtos');
 
     grid.innerHTML = '';
 
-    produtos.forEach(prod => {
+    lista.forEach(prod=>{
 
-        const estoque = estoqueGeral.find(e => e.cod === prod.cod);
+        grid.innerHTML += `
+            <div class="produto"
+            onclick="addCarrinho('${prod.cod}')">
 
-        const qtd = estoque?.quantidade || 0;
+                <h4>${prod.nome}</h4>
 
-        const div = document.createElement('div');
+                <small>
+                    Estoque: ${prod.qtd}
+                </small>
 
-        div.className = 'produto-card';
+                <div class="price">
+                    R$ ${money(prod.preco)}
+                </div>
 
-        div.innerHTML = `
-            <strong>${prod.nome}</strong>
-
-            <div style="margin:6px 0;">
-                R$ ${moeda(prod.venda)}
             </div>
-
-            <small>
-                Estoque: ${qtd}
-            </small>
         `;
-
-        div.onclick = () => adicionarCarrinho(prod.cod);
-
-        grid.appendChild(div);
 
     });
 
 }
 
-function adicionarCarrinho(cod) {
+function buscarProduto(){
 
-    const produto = produtos.find(p => p.cod === cod);
+    const termo = document
+        .getElementById('busca-produto')
+        .value
+        .toLowerCase();
 
-    const estoque = estoqueGeral.find(e => e.cod === cod);
+    const filtrado = produtos.filter(p=>
 
-    if (!produto || !estoque) return;
+        p.nome.toLowerCase().includes(termo)
+        ||
+        p.cod.includes(termo)
 
-    if (estoque.quantidade <= 0) {
+    );
 
-        alert('Sem estoque.');
+    renderProdutosPDV(filtrado);
+
+}
+
+function addCarrinho(cod){
+
+    const prod = produtos.find(p=>p.cod === cod);
+
+    if(!prod) return;
+
+    if(prod.qtd <= 0){
+
+        alert('Sem estoque');
 
         return;
 
     }
 
-    const existe = cart.find(i => i.cod === cod);
+    const item = carrinho.find(i=>i.cod === cod);
 
-    if (existe) {
+    if(item){
 
-        if (existe.qtd >= estoque.quantidade) {
+        if(item.qtd >= prod.qtd){
 
-            alert('Quantidade indisponível.');
+            alert('Quantidade indisponível');
 
             return;
 
         }
 
-        existe.qtd++;
+        item.qtd++;
 
-    } else {
+    }else{
 
-        cart.push({
-            ...produto,
-            qtd: 1
+        carrinho.push({
+            ...prod,
+            qtd:1
         });
 
     }
@@ -237,47 +823,39 @@ function adicionarCarrinho(cod) {
 
 }
 
-function renderCarrinho() {
+function renderCarrinho(){
 
     const area = document.getElementById('cart-items');
 
     area.innerHTML = '';
 
-    if (!cart.length) {
+    let total = 0;
 
-        area.innerHTML = `
-            <div style="padding:20px;text-align:center;color:#999;">
-                Carrinho vazio
-            </div>
-        `;
+    carrinho.forEach((item,index)=>{
 
-    }
+        const subtotal = item.preco * item.qtd;
 
-    let subtotal = 0;
-
-    cart.forEach((item, index) => {
-
-        const total = item.qtd * item.venda;
-
-        subtotal += total;
+        total += subtotal;
 
         area.innerHTML += `
             <div class="cart-item">
 
                 <div>
-                    <strong>${item.qtd}x</strong>
-                    ${item.nome}
+                    ${item.qtd}x ${item.nome}
                 </div>
 
                 <div>
-                    R$ ${moeda(total)}
+
+                    R$ ${money(subtotal)}
 
                     <button
-                        class="btn btn-sm btn-danger"
-                        onclick="removerItem(${index})"
-                    >
-                        ✕
+                    class="btn btn-sm btn-danger"
+                    onclick="removerCarrinho(${index})">
+
+                    ✕
+
                     </button>
+
                 </div>
 
             </div>
@@ -285,26 +863,20 @@ function renderCarrinho() {
 
     });
 
-    const desconto = subtotal * (descontoAtual / 100);
-
-    const totalFinal = subtotal - desconto;
-
     document.getElementById('cart-total')
-        .innerText = moeda(totalFinal);
+        .innerText = money(total);
 
 }
 
-function removerItem(index) {
+function removerCarrinho(index){
 
-    if (!cart[index]) return;
+    if(carrinho[index].qtd > 1){
 
-    if (cart[index].qtd > 1) {
+        carrinho[index].qtd--;
 
-        cart[index].qtd--;
+    }else{
 
-    } else {
-
-        cart.splice(index, 1);
+        carrinho.splice(index,1);
 
     }
 
@@ -312,129 +884,75 @@ function removerItem(index) {
 
 }
 
-function buscarCodigo() {
+function limparCarrinho(){
 
-    const codigo = document
-        .getElementById('barcode-input')
-        .value
-        .trim();
-
-    if (!codigo) return;
-
-    const produto = produtos.find(p =>
-        p.cod.includes(codigo) ||
-        p.nome.toLowerCase().includes(codigo.toLowerCase())
-    );
-
-    if (!produto) {
-
-        alert('Produto não encontrado.');
-
-        return;
-
-    }
-
-    adicionarCarrinho(produto.cod);
-
-    document.getElementById('barcode-input').value = '';
-
-}
-
-function handleBarcode(e) {
-
-    if (e.key === 'Enter') {
-
-        buscarCodigo();
-
-    }
-
-}
-
-function aplicarDesconto() {
-
-    const valor = prompt(
-        'Desconto (%)',
-        descontoAtual
-    );
-
-    if (valor === null) return;
-
-    descontoAtual = Number(valor) || 0;
+    carrinho = [];
 
     renderCarrinho();
 
 }
 
-function finalizarVenda(tipo) {
+function finalizarVenda(tipo){
 
-    if (!cart.length) {
+    if(!carrinho.length){
 
-        alert('Carrinho vazio.');
+        alert('Carrinho vazio');
 
         return;
 
     }
 
-    let subtotal = 0;
-    let custoTotal = 0;
+    let total = 0;
+    let lucro = 0;
 
-    cart.forEach(item => {
+    carrinho.forEach(item=>{
 
-        subtotal += item.venda * item.qtd;
+        const prod = produtos.find(p=>p.cod === item.cod);
 
-        custoTotal += item.custo * item.qtd;
+        prod.qtd -= item.qtd;
 
-        const estoque = estoqueGeral.find(
-            e => e.cod === item.cod
-        );
+        total += item.preco * item.qtd;
 
-        estoque.quantidade -= item.qtd;
+        lucro += (item.preco * .35) * item.qtd;
 
     });
 
-    const desconto = subtotal * (descontoAtual / 100);
-
-    const totalFinal = subtotal - desconto;
-
-    caixa.saldo += totalFinal;
-
-    caixa.lucro += (totalFinal - custoTotal);
+    caixa.saldo += total;
+    caixa.lucro += lucro;
 
     financeiro.push({
 
-        data: new Date().toLocaleString(),
+        data:new Date().toLocaleString(),
 
-        tipo: 'Venda',
+        tipo:'Venda',
 
-        desc: `Venda via ${tipo}`,
+        descricao:`Venda ${tipo}`,
 
-        valor: totalFinal
+        valor:total
 
     });
 
-    cart = [];
+    salvar();
 
-    descontoAtual = 0;
+    carrinho = [];
 
-    salvarDados();
+    renderAll();
 
-    renderTudo();
-
-    alert('Venda finalizada.');
+    alert('Venda concluída');
 
 }
 
-/* =========================================================
+/* ======================================
    ESTOQUE
-========================================================= */
+====================================== */
 
-function renderEstoque() {
+function renderEstoque(){
 
-    const tbody = document.getElementById('estoque-tabela');
+    const tbody = document.getElementById('estoque-body');
 
     tbody.innerHTML = '';
 
-    estoqueGeral.forEach((p, index) => {
+    produtos.forEach((p,index)=>{
 
         tbody.innerHTML += `
             <tr>
@@ -443,34 +961,24 @@ function renderEstoque() {
 
                 <td>${p.nome}</td>
 
-                <td>${p.categoria}</td>
+                <td>${p.qtd}</td>
 
                 <td>
-                    ${p.quantidade}
-                </td>
-
-                <td>
-                    R$ ${moeda(p.custo)}
-                </td>
-
-                <td>
-                    R$ ${moeda(p.venda)}
+                    R$ ${money(p.preco)}
                 </td>
 
                 <td>
 
                     <button
-                        class="btn btn-sm btn-danger"
-                        onclick="alterarEstoque(${index}, -1)"
-                    >
-                        -
+                    class="btn btn-sm btn-danger"
+                    onclick="alterarQtd(${index},-1)">
+                    -
                     </button>
 
                     <button
-                        class="btn btn-sm btn-success"
-                        onclick="alterarEstoque(${index}, 1)"
-                    >
-                        +
+                    class="btn btn-sm btn-success"
+                    onclick="alterarQtd(${index},1)">
+                    +
                     </button>
 
                 </td>
@@ -482,17 +990,17 @@ function renderEstoque() {
 
 }
 
-function alterarEstoque(index, delta) {
+function alterarQtd(index,valor){
 
-    estoqueGeral[index].quantidade += delta;
+    produtos[index].qtd += valor;
 
-    if (estoqueGeral[index].quantidade < 0) {
+    if(produtos[index].qtd < 0){
 
-        estoqueGeral[index].quantidade = 0;
+        produtos[index].qtd = 0;
 
     }
 
-    salvarDados();
+    salvar();
 
     renderEstoque();
 
@@ -500,35 +1008,35 @@ function alterarEstoque(index, delta) {
 
 }
 
-/* =========================================================
+/* ======================================
    FINANCEIRO
-========================================================= */
+====================================== */
 
-function renderFinanceiro() {
+function renderFinanceiro(){
 
-    document.getElementById('fin-saldo-dia')
-        .innerText = moeda(caixa.saldo);
+    document.getElementById('saldo')
+        .innerText = 'R$ ' + money(caixa.saldo);
 
-    document.getElementById('fin-lucro')
-        .innerText = moeda(caixa.lucro);
+    document.getElementById('lucro')
+        .innerText = 'R$ ' + money(caixa.lucro);
 
-    const tabela = document.getElementById('fluxo-tabela');
+    const tbody = document.getElementById('financeiro-body');
 
-    tabela.innerHTML = '';
+    tbody.innerHTML = '';
 
-    financeiro.slice().reverse().forEach(f => {
+    financeiro.slice().reverse().forEach(f=>{
 
-        tabela.innerHTML += `
+        tbody.innerHTML += `
             <tr>
 
                 <td>${f.data}</td>
 
                 <td>${f.tipo}</td>
 
-                <td>${f.desc}</td>
+                <td>${f.descricao}</td>
 
                 <td>
-                    R$ ${moeda(f.valor)}
+                    R$ ${money(f.valor)}
                 </td>
 
             </tr>
@@ -538,105 +1046,19 @@ function renderFinanceiro() {
 
 }
 
-function registrarFin() {
-
-    const tipo = document.getElementById('fin-tipo').value;
-
-    const desc = document.getElementById('fin-desc').value;
-
-    const valor = Number(
-        document.getElementById('fin-valor').value
-    );
-
-    if (!desc || valor <= 0) {
-
-        alert('Dados inválidos.');
-
-        return;
-
-    }
-
-    const valorFinal =
-        tipo === 'despesa'
-        ? -valor
-        : valor;
-
-    financeiro.push({
-
-        data: new Date().toLocaleString(),
-
-        tipo,
-
-        desc,
-
-        valor: valorFinal
-
-    });
-
-    caixa.saldo += valorFinal;
-
-    salvarDados();
-
-    renderFinanceiro();
-
-}
-
-/* =========================================================
+/* ======================================
    CLIENTES
-========================================================= */
+====================================== */
 
-function renderClientes() {
-
-    const tbody = document.getElementById('clientes-tabela');
-
-    tbody.innerHTML = '';
-
-    clientes.forEach((c, index) => {
-
-        tbody.innerHTML += `
-            <tr>
-
-                <td>${c.id}</td>
-
-                <td>${c.nome}</td>
-
-                <td>${c.cpf}</td>
-
-                <td>${c.tel}</td>
-
-                <td>R$ ${moeda(c.credito)}</td>
-
-                <td>${c.pontos}</td>
-
-                <td>R$ ${moeda(c.totalGasto)}</td>
-
-                <td>
-
-                    <button
-                        class="btn btn-sm btn-danger"
-                        onclick="excluirCliente(${index})"
-                    >
-                        ✕
-                    </button>
-
-                </td>
-
-            </tr>
-        `;
-
-    });
-
-}
-
-function salvarCliente() {
+function adicionarCliente(){
 
     const nome = document
-        .getElementById('client-nome')
+        .getElementById('cliente-nome')
         .value;
 
-    if (!nome) {
+    if(!nome){
 
-        alert('Nome obrigatório.');
+        alert('Digite um nome');
 
         return;
 
@@ -644,77 +1066,48 @@ function salvarCliente() {
 
     clientes.push({
 
-        id: Date.now(),
-
         nome,
 
-        cpf: document.getElementById('client-cpf').value,
+        cpf:document.getElementById('cliente-cpf').value,
 
-        tel: document.getElementById('client-tel').value,
-
-        email: document.getElementById('client-email').value,
-
-        credito: Number(
-            document.getElementById('client-credito').value
-        ) || 0,
-
-        pontos: 0,
-
-        totalGasto: 0
+        tel:document.getElementById('cliente-tel').value
 
     });
 
-    salvarDados();
+    salvar();
 
     renderClientes();
 
 }
 
-function excluirCliente(index) {
+function renderClientes(){
 
-    clientes.splice(index, 1);
-
-    salvarDados();
-
-    renderClientes();
-
-}
-
-/* =========================================================
-   PRODUTOS
-========================================================= */
-
-function renderProdutosCadastro() {
-
-    const tbody = document.getElementById('produtos-tabela');
+    const tbody = document.getElementById('clientes-body');
 
     tbody.innerHTML = '';
 
-    produtos.forEach(p => {
-
-        const margem =
-            p.custo > 0
-            ? (((p.venda - p.custo) / p.custo) * 100).toFixed(1)
-            : 0;
+    clientes.forEach((c,index)=>{
 
         tbody.innerHTML += `
             <tr>
 
-                <td>${p.cod}</td>
+                <td>${c.nome}</td>
 
-                <td>${p.nome}</td>
+                <td>${c.cpf}</td>
 
-                <td>${p.categoria}</td>
+                <td>${c.tel}</td>
 
-                <td>${p.marca}</td>
+                <td>
 
-                <td>${p.estMin}</td>
+                    <button
+                    class="btn btn-sm btn-danger"
+                    onclick="removerCliente(${index})">
 
-                <td>R$ ${moeda(p.custo)}</td>
+                    ✕
 
-                <td>R$ ${moeda(p.venda)}</td>
+                    </button>
 
-                <td>${margem}%</td>
+                </td>
 
             </tr>
         `;
@@ -723,66 +1116,64 @@ function renderProdutosCadastro() {
 
 }
 
-function salvarProduto() {
+function removerCliente(index){
 
-    const cod = document.getElementById('prod-codigo').value;
+    clientes.splice(index,1);
 
-    const nome = document.getElementById('prod-nome').value;
+    salvar();
 
-    if (!cod || !nome) {
+    renderClientes();
 
-        alert('Código e nome obrigatórios.');
+}
+
+/* ======================================
+   PRODUTOS
+====================================== */
+
+function adicionarProduto(){
+
+    const cod = document
+        .getElementById('prod-cod')
+        .value;
+
+    const nome = document
+        .getElementById('prod-nome')
+        .value;
+
+    const preco = Number(
+        document.getElementById('prod-preco').value
+    );
+
+    const qtd = Number(
+        document.getElementById('prod-qtd').value
+    );
+
+    if(!cod || !nome){
+
+        alert('Dados inválidos');
 
         return;
 
     }
 
-    if (produtos.some(p => p.cod === cod)) {
+    if(produtos.some(p=>p.cod === cod)){
 
-        alert('Código já cadastrado.');
+        alert('Código já existe');
 
         return;
 
     }
 
-    const produto = {
-
-        id: Date.now(),
+    produtos.push({
 
         cod,
-
         nome,
+        preco,
+        qtd
 
-        categoria: document.getElementById('prod-categoria').value,
-
-        marca: document.getElementById('prod-marca').value,
-
-        un: document.getElementById('prod-unidade').value,
-
-        estMin: Number(
-            document.getElementById('prod-estoque-min').value
-        ) || 0,
-
-        custo: Number(
-            document.getElementById('prod-custo').value
-        ) || 0,
-
-        venda: Number(
-            document.getElementById('prod-venda').value
-        ) || 0,
-
-        ncm: document.getElementById('prod-ncm').value
-
-    };
-
-    produtos.push(produto);
-
-    estoqueGeral.push({
-        ...produto,
-        quantidade: 0
     });
 
-    salvarDados();
+    salvar();
 
     renderProdutosCadastro();
 
@@ -790,49 +1181,64 @@ function salvarProduto() {
 
     renderEstoque();
 
-    alert('Produto cadastrado.');
+}
+
+function renderProdutosCadastro(){
+
+    const tbody = document.getElementById('produtos-body');
+
+    tbody.innerHTML = '';
+
+    produtos.forEach((p,index)=>{
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${p.cod}</td>
+
+                <td>${p.nome}</td>
+
+                <td>
+                    R$ ${money(p.preco)}
+                </td>
+
+                <td>${p.qtd}</td>
+
+                <td>
+
+                    <button
+                    class="btn btn-sm btn-danger"
+                    onclick="removerProduto(${index})">
+
+                    ✕
+
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    });
 
 }
 
-/* =========================================================
-   MOBILE MENU
-========================================================= */
+function removerProduto(index){
 
-function iniciarMenuMobile() {
+    produtos.splice(index,1);
 
-    const sidebar = document.querySelector('aside');
+    salvar();
 
-    const overlay = document.getElementById('overlay');
+    renderProdutosCadastro();
 
-    const toggle = document.getElementById('toggle-sidebar');
+    renderProdutosPDV();
 
-    toggle.addEventListener('click', () => {
-
-        if (window.innerWidth <= 768) {
-
-            sidebar.classList.toggle('mobile-open');
-
-            overlay.style.display =
-                sidebar.classList.contains('mobile-open')
-                ? 'block'
-                : 'none';
-
-        } else {
-
-            sidebar.classList.toggle('collapsed');
-
-        }
-
-    });
-
-    overlay.addEventListener('click', () => {
-
-        sidebar.classList.remove('mobile-open');
-
-        overlay.style.display = 'none';
-
-    });
+    renderEstoque();
 
 }
 
 </script>
+
+</body>
+</html>
+```
