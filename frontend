@@ -1,1 +1,1243 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SisPDV Pro</title>
+
+<style>
+
+:root{
+    --primary:#1e293b;
+    --secondary:#2563eb;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#d97706;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --border:#dbe2ea;
+    --text:#0f172a;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    height:100vh;
+    display:flex;
+    overflow:hidden;
+}
+
+/* SIDEBAR */
+
+aside{
+    width:240px;
+    background:var(--primary);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+    transition:.3s;
+}
+
+.logo{
+    font-size:1.5rem;
+    font-weight:bold;
+    margin-bottom:25px;
+    text-align:center;
+}
+
+.menu-btn{
+    border:none;
+    background:none;
+    color:#cbd5e1;
+    text-align:left;
+    padding:14px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-bottom:8px;
+    transition:.2s;
+    font-size:1rem;
+}
+
+.menu-btn:hover,
+.menu-btn.active{
+    background:var(--secondary);
+    color:#fff;
+}
+
+main{
+    flex:1;
+    overflow-y:auto;
+    padding:20px;
+}
+
+.section{
+    display:block;
+}
+
+.hidden{
+    display:none;
+}
+
+.card{
+    background:var(--card);
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.header{
+    font-size:1.5rem;
+    margin-bottom:20px;
+    font-weight:bold;
+}
+
+/* BUTTONS */
+
+.btn{
+    border:none;
+    border-radius:8px;
+    padding:10px 14px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-primary{
+    background:var(--secondary);
+    color:#fff;
+}
+
+.btn-success{
+    background:var(--success);
+    color:#fff;
+}
+
+.btn-danger{
+    background:var(--danger);
+    color:#fff;
+}
+
+.btn-warning{
+    background:var(--warning);
+    color:#fff;
+}
+
+.btn-sm{
+    padding:6px 10px;
+    font-size:.8rem;
+}
+
+/* INPUTS */
+
+input,
+select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--border);
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,
+td{
+    padding:12px;
+    border-bottom:1px solid var(--border);
+    text-align:left;
+}
+
+th{
+    background:#f8fafc;
+}
+
+/* PDV */
+
+.pdv{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+.produtos{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:12px;
+}
+
+.produto{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.produto:hover{
+    border-color:var(--secondary);
+    transform:translateY(-2px);
+}
+
+.produto h4{
+    font-size:.95rem;
+    margin-bottom:8px;
+}
+
+.produto small{
+    color:#64748b;
+}
+
+.price{
+    color:var(--success);
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.cart{
+    background:#fff;
+    border-radius:12px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    height:100%;
+}
+
+.cart-items{
+    flex:1;
+    overflow-y:auto;
+    margin:15px 0;
+}
+
+.cart-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.total{
+    font-size:1.5rem;
+    font-weight:bold;
+    margin-bottom:15px;
+    text-align:right;
+}
+
+.payment-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+/* MOBILE */
+
+#toggle-menu{
+    display:none;
+}
+
+@media(max-width:768px){
+
+    body{
+        flex-direction:column;
+    }
+
+    aside{
+        position:fixed;
+        top:0;
+        left:-100%;
+        height:100vh;
+        z-index:1000;
+    }
+
+    aside.open{
+        left:0;
+    }
+
+    #toggle-menu{
+        display:block;
+        position:fixed;
+        top:10px;
+        left:10px;
+        z-index:1100;
+        width:45px;
+        height:45px;
+        border:none;
+        border-radius:8px;
+        background:var(--secondary);
+        color:#fff;
+        font-size:1.2rem;
+    }
+
+    main{
+        padding-top:70px;
+    }
+
+    .pdv{
+        grid-template-columns:1fr;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<button id="toggle-menu">☰</button>
+
+<aside id="sidebar">
+
+<div class="logo">
+SisPDV
+</div>
+
+<button class="menu-btn active" onclick="showSection(event,'pdv')">
+🛒 Frente Caixa
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'estoque')">
+📦 Estoque
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'financeiro')">
+💰 Financeiro
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'clientes')">
+👥 Clientes
+</button>
+
+<button class="menu-btn" onclick="showSection(event,'produtos')">
+🏷 Produtos
+</button>
+
+</aside>
+
+<main>
+
+<!-- PDV -->
+
+<section id="section-pdv" class="section">
+
+<div class="header">
+🛒 Frente de Caixa
+</div>
+
+<div class="pdv">
+
+<div>
+
+<div class="card">
+
+<div style="display:flex; gap:10px; margin-bottom:15px;">
+
+<input
+type="text"
+id="busca-produto"
+placeholder="Código ou nome..."
+onkeyup="buscarProduto()"
+>
+
+</div>
+
+<div class="produtos" id="grid-produtos"></div>
+
+</div>
+
+</div>
+
+<div class="cart">
+
+<h3>Cupom</h3>
+
+<div class="cart-items" id="cart-items"></div>
+
+<div class="total">
+R$ <span id="cart-total">0,00</span>
+</div>
+
+<div class="payment-grid">
+
+<button class="btn btn-success"
+onclick="finalizarVenda('Dinheiro')">
+💵 Dinheiro
+</button>
+
+<button class="btn btn-primary"
+onclick="finalizarVenda('Pix')">
+📱 Pix
+</button>
+
+<button class="btn btn-warning"
+onclick="finalizarVenda('Cartão')">
+💳 Cartão
+</button>
+
+<button class="btn btn-danger"
+onclick="limparCarrinho()">
+🗑 Limpar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ESTOQUE -->
+
+<section id="section-estoque" class="section hidden">
+
+<div class="header">
+📦 Estoque
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Código</th>
+<th>Produto</th>
+<th>Qtd</th>
+<th>Preço</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="estoque-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- FINANCEIRO -->
+
+<section id="section-financeiro" class="section hidden">
+
+<div class="header">
+💰 Financeiro
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+<div class="card">
+<h3>Saldo</h3>
+<h1 id="saldo">R$ 0,00</h1>
+</div>
+
+<div class="card">
+<h3>Lucro</h3>
+<h1 id="lucro">R$ 0,00</h1>
+</div>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Data</th>
+<th>Tipo</th>
+<th>Descrição</th>
+<th>Valor</th>
+</tr>
+</thead>
+
+<tbody id="financeiro-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- CLIENTES -->
+
+<section id="section-clientes" class="section hidden">
+
+<div class="header">
+👥 Clientes
+</div>
+
+<div class="card">
+
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:10px;">
+
+<input type="text" id="cliente-nome" placeholder="Nome">
+<input type="text" id="cliente-cpf" placeholder="CPF">
+<input type="text" id="cliente-tel" placeholder="Telefone">
+
+<button class="btn btn-success"
+onclick="adicionarCliente()">
+Salvar
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Nome</th>
+<th>CPF</th>
+<th>Telefone</th>
+<th>Ação</th>
+</tr>
+</thead>
+
+<tbody id="clientes-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<!-- PRODUTOS -->
+
+<section id="section-produtos" class="section hidden">
+
+<div class="header">
+🏷 Produtos
+</div>
+
+<div class="card">
+
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:10px;">
+
+<input type="text" id="prod-cod" placeholder="Código">
+<input type="text" id="prod-nome" placeholder="Nome">
+<input type="number" id="prod-preco" placeholder="Preço">
+<input type="number" id="prod-qtd" placeholder="Qtd">
+
+<button class="btn btn-success"
+onclick="adicionarProduto()">
+Cadastrar
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Código</th>
+<th>Produto</th>
+<th>Preço</th>
+<th>Qtd</th>
+<th>Ação</th>
+</tr>
+</thead>
+
+<tbody id="produtos-body"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+</main>
+
+<script>
+
+/* ======================================
+   DATABASE
+====================================== */
+
+let produtos = [
+    {
+        cod:'7891',
+        nome:'Coca Cola',
+        preco:6,
+        qtd:20
+    },
+
+    {
+        cod:'7892',
+        nome:'Arroz 5KG',
+        preco:32,
+        qtd:10
+    },
+
+    {
+        cod:'7893',
+        nome:'Feijão',
+        preco:9,
+        qtd:15
+    }
+];
+
+let clientes = [];
+
+let financeiro = [];
+
+let carrinho = [];
+
+let caixa = {
+    saldo:0,
+    lucro:0
+};
+
+/* ======================================
+   INIT
+====================================== */
+
+document.addEventListener('DOMContentLoaded',()=>{
+
+    carregar();
+
+    renderAll();
+
+    iniciarMenu();
+
+});
+
+/* ======================================
+   STORAGE
+====================================== */
+
+function salvar(){
+
+    localStorage.setItem('sisPDV_v2',JSON.stringify({
+        produtos,
+        clientes,
+        financeiro,
+        caixa
+    }));
+
+}
+
+function carregar(){
+
+    const db = localStorage.getItem('sisPDV_v2');
+
+    if(!db) return;
+
+    const dados = JSON.parse(db);
+
+    produtos = dados.produtos || produtos;
+    clientes = dados.clientes || [];
+    financeiro = dados.financeiro || [];
+    caixa = dados.caixa || caixa;
+
+}
+
+/* ======================================
+   UTIL
+====================================== */
+
+function money(v){
+
+    return Number(v || 0)
+        .toFixed(2)
+        .replace('.',',');
+
+}
+
+/* ======================================
+   MENU
+====================================== */
+
+function showSection(event,id){
+
+    document.querySelectorAll('.section')
+        .forEach(sec=>sec.classList.add('hidden'));
+
+    document.getElementById('section-'+id)
+        .classList.remove('hidden');
+
+    document.querySelectorAll('.menu-btn')
+        .forEach(btn=>btn.classList.remove('active'));
+
+    event.currentTarget.classList.add('active');
+
+    if(window.innerWidth <= 768){
+
+        document.getElementById('sidebar')
+            .classList.remove('open');
+
+    }
+
+}
+
+function iniciarMenu(){
+
+    document.getElementById('toggle-menu')
+        .addEventListener('click',()=>{
+
+            document.getElementById('sidebar')
+                .classList.toggle('open');
+
+        });
+
+}
+
+/* ======================================
+   RENDER
+====================================== */
+
+function renderAll(){
+
+    renderProdutosPDV();
+
+    renderCarrinho();
+
+    renderEstoque();
+
+    renderFinanceiro();
+
+    renderClientes();
+
+    renderProdutosCadastro();
+
+}
+
+/* ======================================
+   PDV
+====================================== */
+
+function renderProdutosPDV(lista = produtos){
+
+    const grid = document.getElementById('grid-produtos');
+
+    grid.innerHTML = '';
+
+    lista.forEach(prod=>{
+
+        grid.innerHTML += `
+            <div class="produto"
+            onclick="addCarrinho('${prod.cod}')">
+
+                <h4>${prod.nome}</h4>
+
+                <small>
+                    Estoque: ${prod.qtd}
+                </small>
+
+                <div class="price">
+                    R$ ${money(prod.preco)}
+                </div>
+
+            </div>
+        `;
+
+    });
+
+}
+
+function buscarProduto(){
+
+    const termo = document
+        .getElementById('busca-produto')
+        .value
+        .toLowerCase();
+
+    const filtrado = produtos.filter(p=>
+
+        p.nome.toLowerCase().includes(termo)
+        ||
+        p.cod.includes(termo)
+
+    );
+
+    renderProdutosPDV(filtrado);
+
+}
+
+function addCarrinho(cod){
+
+    const prod = produtos.find(p=>p.cod === cod);
+
+    if(!prod) return;
+
+    if(prod.qtd <= 0){
+
+        alert('Sem estoque');
+
+        return;
+
+    }
+
+    const item = carrinho.find(i=>i.cod === cod);
+
+    if(item){
+
+        if(item.qtd >= prod.qtd){
+
+            alert('Quantidade indisponível');
+
+            return;
+
+        }
+
+        item.qtd++;
+
+    }else{
+
+        carrinho.push({
+            ...prod,
+            qtd:1
+        });
+
+    }
+
+    renderCarrinho();
+
+}
+
+function renderCarrinho(){
+
+    const area = document.getElementById('cart-items');
+
+    area.innerHTML = '';
+
+    let total = 0;
+
+    carrinho.forEach((item,index)=>{
+
+        const subtotal = item.preco * item.qtd;
+
+        total += subtotal;
+
+        area.innerHTML += `
+            <div class="cart-item">
+
+                <div>
+                    ${item.qtd}x ${item.nome}
+                </div>
+
+                <div>
+
+                    R$ ${money(subtotal)}
+
+                    <button
+                    class="btn btn-sm btn-danger"
+                    onclick="removerCarrinho(${index})">
+
+                    ✕
+
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+    });
+
+    document.getElementById('cart-total')
+        .innerText = money(total);
+
+}
+
+function removerCarrinho(index){
+
+    if(carrinho[index].qtd > 1){
+
+        carrinho[index].qtd--;
+
+    }else{
+
+        carrinho.splice(index,1);
+
+    }
+
+    renderCarrinho();
+
+}
+
+function limparCarrinho(){
+
+    carrinho = [];
+
+    renderCarrinho();
+
+}
+
+function finalizarVenda(tipo){
+
+    if(!carrinho.length){
+
+        alert('Carrinho vazio');
+
+        return;
+
+    }
+
+    let total = 0;
+    let lucro = 0;
+
+    carrinho.forEach(item=>{
+
+        const prod = produtos.find(p=>p.cod === item.cod);
+
+        prod.qtd -= item.qtd;
+
+        total += item.preco * item.qtd;
+
+        lucro += (item.preco * .35) * item.qtd;
+
+    });
+
+    caixa.saldo += total;
+    caixa.lucro += lucro;
+
+    financeiro.push({
+
+        data:new Date().toLocaleString(),
+
+        tipo:'Venda',
+
+        descricao:`Venda ${tipo}`,
+
+        valor:total
+
+    });
+
+    salvar();
+
+    carrinho = [];
+
+    renderAll();
+
+    alert('Venda concluída');
+
+}
+
+/* ======================================
+   ESTOQUE
+====================================== */
+
+function renderEstoque(){
+
+    const tbody = document.getElementById('estoque-body');
+
+    tbody.innerHTML = '';
+
+    produtos.forEach((p,index)=>{
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${p.cod}</td>
+
+                <td>${p.nome}</td>
+
+                <td>${p.qtd}</td>
+
+                <td>
+                    R$ ${money(p.preco)}
+                </td>
+
+                <td>
+
+                    <button
+                    class="btn btn-sm btn-danger"
+                    onclick="alterarQtd(${index},-1)">
+                    -
+                    </button>
+
+                    <button
+                    class="btn btn-sm btn-success"
+                    onclick="alterarQtd(${index},1)">
+                    +
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+}
+
+function alterarQtd(index,valor){
+
+    produtos[index].qtd += valor;
+
+    if(produtos[index].qtd < 0){
+
+        produtos[index].qtd = 0;
+
+    }
+
+    salvar();
+
+    renderEstoque();
+
+    renderProdutosPDV();
+
+}
+
+/* ======================================
+   FINANCEIRO
+====================================== */
+
+function renderFinanceiro(){
+
+    document.getElementById('saldo')
+        .innerText = 'R$ ' + money(caixa.saldo);
+
+    document.getElementById('lucro')
+        .innerText = 'R$ ' + money(caixa.lucro);
+
+    const tbody = document.getElementById('financeiro-body');
+
+    tbody.innerHTML = '';
+
+    financeiro.slice().reverse().forEach(f=>{
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${f.data}</td>
+
+                <td>${f.tipo}</td>
+
+                <td>${f.descricao}</td>
+
+                <td>
+                    R$ ${money(f.valor)}
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+}
+
+/* ======================================
+   CLIENTES
+====================================== */
+
+function adicionarCliente(){
+
+    const nome = document
+        .getElementById('cliente-nome')
+        .value;
+
+    if(!nome){
+
+        alert('Digite um nome');
+
+        return;
+
+    }
+
+    clientes.push({
+
+        nome,
+
+        cpf:document.getElementById('cliente-cpf').value,
+
+        tel:document.getElementById('cliente-tel').value
+
+    });
+
+    salvar();
+
+    renderClientes();
+
+}
+
+function renderClientes(){
+
+    const tbody = document.getElementById('clientes-body');
+
+    tbody.innerHTML = '';
+
+    clientes.forEach((c,index)=>{
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${c.nome}</td>
+
+                <td>${c.cpf}</td>
+
+                <td>${c.tel}</td>
+
+                <td>
+
+                    <button
+                    class="btn btn-sm btn-danger"
+                    onclick="removerCliente(${index})">
+
+                    ✕
+
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+}
+
+function removerCliente(index){
+
+    clientes.splice(index,1);
+
+    salvar();
+
+    renderClientes();
+
+}
+
+/* ======================================
+   PRODUTOS
+====================================== */
+
+function adicionarProduto(){
+
+    const cod = document
+        .getElementById('prod-cod')
+        .value;
+
+    const nome = document
+        .getElementById('prod-nome')
+        .value;
+
+    const preco = Number(
+        document.getElementById('prod-preco').value
+    );
+
+    const qtd = Number(
+        document.getElementById('prod-qtd').value
+    );
+
+    if(!cod || !nome){
+
+        alert('Dados inválidos');
+
+        return;
+
+    }
+
+    if(produtos.some(p=>p.cod === cod)){
+
+        alert('Código já existe');
+
+        return;
+
+    }
+
+    produtos.push({
+
+        cod,
+        nome,
+        preco,
+        qtd
+
+    });
+
+    salvar();
+
+    renderProdutosCadastro();
+
+    renderProdutosPDV();
+
+    renderEstoque();
+
+}
+
+function renderProdutosCadastro(){
+
+    const tbody = document.getElementById('produtos-body');
+
+    tbody.innerHTML = '';
+
+    produtos.forEach((p,index)=>{
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${p.cod}</td>
+
+                <td>${p.nome}</td>
+
+                <td>
+                    R$ ${money(p.preco)}
+                </td>
+
+                <td>${p.qtd}</td>
+
+                <td>
+
+                    <button
+                    class="btn btn-sm btn-danger"
+                    onclick="removerProduto(${index})">
+
+                    ✕
+
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+}
+
+function removerProduto(index){
+
+    produtos.splice(index,1);
+
+    salvar();
+
+    renderProdutosCadastro();
+
+    renderProdutosPDV();
+
+    renderEstoque();
+
+}
+
+</script>
+
+</body>
+</html>
